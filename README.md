@@ -12,7 +12,7 @@ $ go get github.com/glassonion1/sqlw
 ```
 
 ## Usage
-## Database connection
+### Database connection
 
 Connects to database.
 ```go
@@ -87,7 +87,7 @@ for rows.Next() {
 }
 ```
 
-// Query the database uses prepare method(exec on replica)
+Query the database uses prepare method(exec on replica)
 ```go
 // Instanciates statement object
 stmt, err := db.PrepareQuery("SELECT * FROM users WHERE name = ?")
@@ -112,7 +112,7 @@ for rows.Next() {
 }
 ```
 
-// Executes the mutation query(exec on master)
+Executes the mutation query(exec on master)
 ```go
 db, err := sqlw.NewMySQLDB(master, rep1, rep2)
 if err != nil {
@@ -125,7 +125,7 @@ if err != nil {
 }
 ```
 
-// Executes the mutation query uses prepare method(exec on master)
+Executes the mutation query uses prepare method(exec on master)
 ```go
 // Instanciates statement object
 stmt, err := db.PrepareMutation("INSERT INTO users(id, name) VALUES(?, ?)")
@@ -171,7 +171,7 @@ if err := db.Transaction(fn); err != nil {
 rows, err := db.QueryForMaster("SELECT * FROM user")
 ```
 
-## Unit test
+## Unit tests
 
 Executes unit tests
 ```
