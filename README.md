@@ -11,6 +11,8 @@ Manages automatically on the master/replica databases
 $ go get github.com/glassonion1/sqlw
 ```
 
+In addition to the [godoc API documentation](https://godoc.org/github.com/glassonion1/sqlw).
+
 ## Usage
 ### Database connection
 
