@@ -6,12 +6,12 @@
 database/sql wrapper library for Go  
 Manages automatically on the master/replica databases
 
+In addition to the [godoc API documentation](https://godoc.org/github.com/glassonion1/sqlw).
+
 ## Install
 ```
 $ go get github.com/glassonion1/sqlw
 ```
-
-In addition to the [godoc API documentation](https://godoc.org/github.com/glassonion1/sqlw).
 
 ## Usage
 ### Database connection
