@@ -13,7 +13,6 @@ var (
 )
 
 var (
-	queryRe    = regexp.MustCompile("^select.*$")
 	mutationRe = regexp.MustCompile("[^insert.*$|^update.*$|^delete.*$]")
 )
 
@@ -23,7 +22,7 @@ type SQLQuery string
 // Validate validates whether the string is a query(SELECT) statements.
 func (s SQLQuery) Validate() error {
 	str := strings.ToLower(string(s))
-	if !queryRe.MatchString(str) {
+	if !strings.HasPrefix(str, "select") {
 		return ErrNotSQLQuery
 	}
 	return nil
