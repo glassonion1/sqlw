@@ -1,8 +1,8 @@
 # sqlw
 
-![CI for Pull Request](https://github.com/glassonion1/sqlw/workflows/CI%20for%20Pull%20Request/badge.svg?style=flat-square)
-[![Godoc](https://img.shields.io/badge/godoc-reference-blue?style=flat-square)](https://godoc.org/github.com/glassonion1/sqlw)
-[![GitHub license](https://img.shields.io/github/license/glassonion1/sqlw?style=flat-square)](https://github.com/glassonion1/sqlw/blob/main/LICENSE)
+![CI for Pull Request](https://github.com/glassonion1/sqlw/workflows/CI%20for%20Pull%20Request/badge.svg)
+[![Godoc](https://img.shields.io/badge/godoc-reference-blue)](https://godoc.org/github.com/glassonion1/sqlw)
+[![GitHub license](https://img.shields.io/github/license/glassonion1/sqlw)](https://github.com/glassonion1/sqlw/blob/main/LICENSE)
 
 database/sql wrapper library for Go  
 Manages automatically on the master/replica databases
