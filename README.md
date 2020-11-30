@@ -17,7 +17,7 @@ $ go get github.com/glassonion1/sqlw
 ## Usage
 ### Database connection
 
-Connects to database.
+Connects to the database that with one master and two replicas.
 ```go
 // Settings for master
 master := sqlw.Config{
@@ -36,6 +36,20 @@ rep2 := sqlw.Config{
 }
 // Connects to mysql
 db, err := sqlw.NewMySQLDB(master, rep1, rep2)
+if err != nil {
+  // TODO: Handle error.
+}
+```
+
+Connects to the database that without replicas
+```go
+// Settings for master
+master := sqlw.Config{
+  User: "root", Password: "password",
+  Host: "127.0.0.1", Port: "3306", DBName: "app",
+}
+// Connects to mysql
+db, err := sqlw.NewMySQLDB(master)
 if err != nil {
   // TODO: Handle error.
 }
