@@ -1,7 +1,8 @@
 # sqlw
 
-[![Godoc](https://img.shields.io/badge/godoc-reference-blue?style=flat-square)](https://godoc.org/github.com/glassonion1/sqlw)
-[![GitHub license](https://img.shields.io/github/license/glassonion1/sqlw?style=flat-square)](https://github.com/glassonion1/sqlw/blob/main/LICENSE)
+![CI for Pull Request](https://github.com/glassonion1/sqlw/workflows/CI%20for%20Pull%20Request/badge.svg)
+[![Godoc](https://img.shields.io/badge/godoc-reference-blue)](https://godoc.org/github.com/glassonion1/sqlw)
+[![GitHub license](https://img.shields.io/github/license/glassonion1/sqlw)](https://github.com/glassonion1/sqlw/blob/main/LICENSE)
 
 database/sql wrapper library for Go  
 Manages automatically on the master/replica databases
@@ -16,7 +17,7 @@ $ go get github.com/glassonion1/sqlw
 ## Usage
 ### Database connection
 
-Connects to database.
+Connects to the database that with one master and two replicas.
 ```go
 // Settings for master
 master := sqlw.Config{
@@ -35,6 +36,20 @@ rep2 := sqlw.Config{
 }
 // Connects to mysql
 db, err := sqlw.NewMySQLDB(master, rep1, rep2)
+if err != nil {
+  // TODO: Handle error.
+}
+```
+
+Connects to the database that without replicas
+```go
+// Settings for master
+master := sqlw.Config{
+  User: "root", Password: "password",
+  Host: "127.0.0.1", Port: "3306", DBName: "app",
+}
+// Connects to mysql
+db, err := sqlw.NewMySQLDB(master)
 if err != nil {
   // TODO: Handle error.
 }
