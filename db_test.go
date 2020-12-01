@@ -26,11 +26,12 @@ func TestDBReadable(t *testing.T) {
 
 	replica1, err := sql.Open("mysql", "root:password@tcp(:3307)/app")
 	if err != nil {
-		log.Println(err)
+		log.Printf("error replica1: %v", err)
 	}
+
 	replica2, err := sql.Open("mysql", "root:password@tcp(:3308)/app")
 	if err != nil {
-		log.Println(err)
+		log.Printf("error replica2: %v", err)
 	}
 
 	// Deliberately close for testing
@@ -42,34 +43,40 @@ func TestDBReadable(t *testing.T) {
 	}
 
 	tests := []struct {
-		name string
-		in   *sqlw.DB
-		err  error
+		name    string
+		in      *sqlw.DB
+		wantErr bool
 	}{
 		{
-			name: "one master",
-			in:   sqlw.ExportNewDB(master),
-			err:  nil,
+			name:    "one master",
+			in:      sqlw.NewDB(master),
+			wantErr: false,
 		},
 		{
-			name: "one master and one replica",
-			in:   sqlw.ExportNewDB(master, replica1, replica2),
-			err:  nil,
+			name:    "one master and one replica",
+			in:      sqlw.NewDB(master, replica1),
+			wantErr: false,
 		},
 		{
-			name: "one master and two replicas",
-			in:   sqlw.ExportNewDB(closedmaster, replica1, replica2),
-			err:  nil,
+			name:    "one master and two replicas",
+			in:      sqlw.NewDB(master, replica1, replica2),
+			wantErr: false,
+		},
+
+		{
+			name:    "one closed master and two replicas",
+			in:      sqlw.NewDB(closedmaster, replica1, replica2),
+			wantErr: true,
 		},
 		{
-			name: "one master and two replicas",
-			in:   sqlw.ExportNewDB(closedmaster, closedreplica, replica2),
-			err:  nil,
+			name:    "one closed master and one cloed replica and replica",
+			in:      sqlw.NewDB(closedmaster, closedreplica, replica2),
+			wantErr: true,
 		},
 		{
-			name: "one master and one replica",
-			in:   sqlw.ExportNewDB(closedmaster, closedreplica),
-			err:  errors.New("connection refused from all databases"),
+			name:    "one closed master and one closed replica",
+			in:      sqlw.NewDB(closedmaster, closedreplica),
+			wantErr: true,
 		},
 	}
 
@@ -79,8 +86,8 @@ func TestDBReadable(t *testing.T) {
 			t.Parallel()
 
 			err := tt.in.Readable()
-			if err != nil && err.Error() != tt.err.Error() {
-				t.Errorf("testing %s: should be error of %v but got: %v", tt.name, tt.err, err)
+			if tt.wantErr != (err != nil) {
+				t.Errorf("wantErr: %v, err: %v", tt.wantErr, err)
 			}
 		})
 	}
@@ -124,22 +131,22 @@ func TestDBWritable(t *testing.T) {
 	}{
 		{
 			name: "one master",
-			in:   sqlw.ExportNewDB(master),
+			in:   sqlw.NewDB(master),
 			err:  nil,
 		},
 		{
 			name: "one master",
-			in:   sqlw.ExportNewDB(closedmaster),
+			in:   sqlw.NewDB(closedmaster),
 			err:  errors.New("sql: database is closed"),
 		},
 		{
 			name: "one master and two replicas",
-			in:   sqlw.ExportNewDB(master, replica1, replica2),
+			in:   sqlw.NewDB(master, replica1, replica2),
 			err:  nil,
 		},
 		{
 			name: "one master and one replica",
-			in:   sqlw.ExportNewDB(master, closedreplica),
+			in:   sqlw.NewDB(master, closedreplica),
 			err:  nil,
 		},
 	}

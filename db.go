@@ -40,7 +40,7 @@ func NewMySQLDB(masterConf Config, replicaConfs ...Config) (*DB, error) {
 		}
 		replicas = append(replicas, r)
 	}
-	return newDB(master, replicas...), nil
+	return NewDB(master, replicas...), nil
 }
 
 // NewPostgresDB returns a new sqlx DB wrapper for a pre-existing *sql.DB
@@ -63,10 +63,13 @@ func NewPostgresDB(masterConf Config, replicaConfs ...Config) (*DB, error) {
 		}
 		replicas = append(replicas, r)
 	}
-	return newDB(master, replicas...), nil
+	return NewDB(master, replicas...), nil
 }
 
-func newDB(master *sql.DB, readreplicas ...*sql.DB) *DB {
+// NewDB returns a new sqlx DB wrapper for a pre-existing *sql.DB
+//
+// This function should be used outside of Goroutine.
+func NewDB(master *sql.DB, readreplicas ...*sql.DB) *DB {
 	rand.Seed(time.Now().UnixNano())
 
 	list := []*sql.DB{}
@@ -90,18 +93,18 @@ func (db *DB) getReplica() *sql.DB {
 
 // Close closes all databases.
 func (db *DB) Close() error {
-	errorList := []string{}
+	errList := []string{}
 	if err := db.master.Close(); err != nil {
-		errorList = append(errorList, err.Error())
+		errList = append(errList, err.Error())
 	}
 
 	for _, r := range db.readreplicas {
 		if rerr := r.Close(); rerr != nil {
-			errorList = append(errorList, rerr.Error())
+			errList = append(errList, rerr.Error())
 		}
 	}
-	if len(errorList) > 0 {
-		str := strings.Join(errorList, ",")
+	if len(errList) > 0 {
+		str := strings.Join(errList, ",")
 		return errors.New(str)
 	}
 	return nil
@@ -133,23 +136,25 @@ func (db *DB) SetMaxOpenConns(n int) {
 
 // Readable checks if the database can be readable.
 func (db *DB) Readable() error {
-	readable := false
+	errList := []string{}
 
-	if err := db.master.Ping(); err == nil {
-		readable = true
+	if err := db.master.Ping(); err != nil {
+		errList = append(errList, fmt.Sprintf("failed to ping master: %v", err))
 	}
 
-	for _, r := range db.readreplicas {
-		if err := r.Ping(); err == nil {
-			readable = true
+	for i, r := range db.readreplicas {
+		if err := r.Ping(); err != nil {
+			str := fmt.Sprintf("failed to ping replica%d: %v", i, err)
+			errList = append(errList, str)
 		}
 	}
 
-	if readable {
-		return nil
+	if len(errList) > 0 {
+		str := strings.Join(errList, ",")
+		return errors.New(str)
 	}
 
-	return errors.New("connection refused from all databases")
+	return nil
 }
 
 // Writable checks if the database is writable.
