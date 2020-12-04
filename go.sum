@@ -3,6 +3,9 @@ github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/dgrijalva/jwt-go v1.0.2 h1:KPldsxuKGsS2FPWsNeg9ZO18aCrGKujPoWXn2yo+KQM=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumCAMpl/TFQ4/5kLM=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
+github.com/glassonion1/sqlw v0.0.2/go.mod h1:hnDsUiprdub27NanQoqLTHYzPp5iPRWTTfGB0UcWTGk=
+github.com/glassonion1/sqlw/sample v0.0.0-20201204012504-52c4d1ea09e3 h1:b3VHVlKgNY1FgeJI+XHIKL8g/tAQVVrig+6FOU5pwY4=
+github.com/glassonion1/sqlw/sample v0.0.0-20201204012504-52c4d1ea09e3/go.mod h1:sGM2wU3pNj2gqh6/55+3GJ1p90Wc3G8dgrPJ9XCz37o=
 github.com/go-sql-driver/mysql v1.5.0 h1:ozyZYNQW3x3HtqT1jira07DN2PArx2v7/mN66gGcHOs=
 github.com/go-sql-driver/mysql v1.5.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
 github.com/google/go-cmp v0.5.2 h1:X2ev0eStA3AbceY54o37/0PQ/UWqKEiiO2dKL5OPaFM=

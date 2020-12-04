@@ -71,10 +71,10 @@ func (r *Item) Create(item model.Item) (*model.Item, error) {
 	if row.Err() != nil {
 		return nil, row.Err()
 	}
-	new := model.Item{}
+	new := &model.Item{}
 	if err := row.Scan(&new.ID, &new.Name); err != nil {
 		return nil, err
 	}
 
-	return &new, nil
+	return new, nil
 }

@@ -9,6 +9,10 @@ import (
 	"github.com/glassonion1/sqlw/sample/usecase/interactor"
 )
 
+type JSONErr struct {
+	Error string
+}
+
 // ItemHandler is http handler for item resources
 type ItemHandler struct {
 	interactor *interactor.Item
@@ -25,7 +29,7 @@ func (h *ItemHandler) List() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		items, err := h.interactor.FindAll()
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, err)
+			return c.JSON(http.StatusInternalServerError, JSONErr{err.Error()})
 		}
 		return c.JSON(http.StatusOK, items)
 	}
@@ -37,7 +41,7 @@ func (h *ItemHandler) Get() echo.HandlerFunc {
 		id := c.Param("item_id")
 		item, err := h.interactor.FindByID(id)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, err)
+			return c.JSON(http.StatusInternalServerError, JSONErr{err.Error()})
 		}
 		return c.JSON(http.StatusOK, item)
 	}
@@ -48,11 +52,11 @@ func (h *ItemHandler) Create() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		item := model.Item{}
 		if err := c.Bind(&item); err != nil {
-			return c.JSON(http.StatusInternalServerError, err)
+			return c.JSON(http.StatusInternalServerError, JSONErr{err.Error()})
 		}
 		new, err := h.interactor.Create(item)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, err)
+			return c.JSON(http.StatusInternalServerError, JSONErr{err.Error()})
 		}
 		return c.JSON(http.StatusOK, new)
 	}
