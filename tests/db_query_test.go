@@ -52,44 +52,21 @@ func TestDBQuery(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			// No context
-			{
-				rows, err := db.Query(tt.in)
-				if err != nil {
-					t.Error(err)
-				}
-				defer rows.Close()
-				got := []user{}
-				for rows.Next() {
-					user := user{}
-					if err := rows.Scan(&user.ID, &user.Name); err != nil {
-						t.Error(err)
-					}
-					got = append(got, user)
-				}
-				if diff := cmp.Diff(got, tt.want); diff != "" {
-					t.Errorf("failed test %s: %v", tt.name, diff)
-				}
+			rows, err := db.Query(context.Background(), tt.in)
+			if err != nil {
+				t.Error(err)
 			}
-
-			// With context
-			{
-				rows, err := db.QueryContext(context.Background(), tt.in)
-				if err != nil {
+			defer rows.Close()
+			got := []user{}
+			for rows.Next() {
+				user := user{}
+				if err := rows.Scan(&user.ID, &user.Name); err != nil {
 					t.Error(err)
 				}
-				defer rows.Close()
-				got := []user{}
-				for rows.Next() {
-					user := user{}
-					if err := rows.Scan(&user.ID, &user.Name); err != nil {
-						t.Error(err)
-					}
-					got = append(got, user)
-				}
-				if diff := cmp.Diff(got, tt.want); diff != "" {
-					t.Errorf("failed test %s: %v", tt.name, diff)
-				}
+				got = append(got, user)
+			}
+			if diff := cmp.Diff(got, tt.want); diff != "" {
+				t.Errorf("failed test %s: %v", tt.name, diff)
 			}
 		})
 	}
@@ -134,44 +111,21 @@ func TestDBQueryForMaster(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			// No context
-			{
-				rows, err := db.QueryForMaster(tt.in)
-				if err != nil {
-					t.Error(err)
-				}
-				defer rows.Close()
-				got := []user{}
-				for rows.Next() {
-					user := user{}
-					if err := rows.Scan(&user.ID, &user.Name); err != nil {
-						t.Error(err)
-					}
-					got = append(got, user)
-				}
-				if diff := cmp.Diff(got, tt.want); diff != "" {
-					t.Errorf("failed test %s: %v", tt.name, diff)
-				}
+			rows, err := db.QueryForMaster(context.Background(), tt.in)
+			if err != nil {
+				t.Error(err)
 			}
-
-			// With context
-			{
-				rows, err := db.QueryContextForMaster(context.Background(), tt.in)
-				if err != nil {
+			defer rows.Close()
+			got := []user{}
+			for rows.Next() {
+				user := user{}
+				if err := rows.Scan(&user.ID, &user.Name); err != nil {
 					t.Error(err)
 				}
-				defer rows.Close()
-				got := []user{}
-				for rows.Next() {
-					user := user{}
-					if err := rows.Scan(&user.ID, &user.Name); err != nil {
-						t.Error(err)
-					}
-					got = append(got, user)
-				}
-				if diff := cmp.Diff(got, tt.want); diff != "" {
-					t.Errorf("failed test %s: %v", tt.name, diff)
-				}
+				got = append(got, user)
+			}
+			if diff := cmp.Diff(got, tt.want); diff != "" {
+				t.Errorf("failed test %s: %v", tt.name, diff)
 			}
 		})
 	}
@@ -218,34 +172,16 @@ func TestDBQueryRow(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			// No context
-			{
-				row := db.QueryRow(tt.in)
-				if err := row.Err(); err != nil {
-					t.Error(err)
-				}
-				got := user{}
-				if err := row.Scan(&got.ID, &got.Name); err != nil {
-					t.Error(err)
-				}
-				if diff := cmp.Diff(got, tt.want); diff != "" {
-					t.Errorf("failed test %s: %v", tt.name, diff)
-				}
+			row := db.QueryRow(context.Background(), tt.in)
+			if err := row.Err(); err != nil {
+				t.Error(err)
 			}
-
-			// With context
-			{
-				row := db.QueryRowContext(context.Background(), tt.in)
-				if err := row.Err(); err != nil {
-					t.Error(err)
-				}
-				got := user{}
-				if err := row.Scan(&got.ID, &got.Name); err != nil {
-					t.Error(err)
-				}
-				if diff := cmp.Diff(got, tt.want); diff != "" {
-					t.Errorf("failed test %s: %v", tt.name, diff)
-				}
+			got := user{}
+			if err := row.Scan(&got.ID, &got.Name); err != nil {
+				t.Error(err)
+			}
+			if diff := cmp.Diff(got, tt.want); diff != "" {
+				t.Errorf("failed test %s: %v", tt.name, diff)
 			}
 		})
 	}
@@ -288,34 +224,16 @@ func TestDBQueryRowForMaster(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			// No context
-			{
-				row := db.QueryRowForMaster(tt.in)
-				if err := row.Err(); err != nil {
-					t.Error(err)
-				}
-				got := user{}
-				if err := row.Scan(&got.ID, &got.Name); err != nil {
-					t.Error(err)
-				}
-				if diff := cmp.Diff(got, tt.want); diff != "" {
-					t.Errorf("failed test %s: %v", tt.name, diff)
-				}
+			row := db.QueryRowForMaster(context.Background(), tt.in)
+			if err := row.Err(); err != nil {
+				t.Error(err)
 			}
-
-			// With context
-			{
-				row := db.QueryRowContextForMaster(context.Background(), tt.in)
-				if err := row.Err(); err != nil {
-					t.Error(err)
-				}
-				got := user{}
-				if err := row.Scan(&got.ID, &got.Name); err != nil {
-					t.Error(err)
-				}
-				if diff := cmp.Diff(got, tt.want); diff != "" {
-					t.Errorf("failed test %s: %v", tt.name, diff)
-				}
+			got := user{}
+			if err := row.Scan(&got.ID, &got.Name); err != nil {
+				t.Error(err)
+			}
+			if diff := cmp.Diff(got, tt.want); diff != "" {
+				t.Errorf("failed test %s: %v", tt.name, diff)
 			}
 		})
 	}

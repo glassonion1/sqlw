@@ -164,38 +164,18 @@ func (db *DB) Writable() error {
 
 // Query executes a query that returns rows, typically a SELECT.
 // This method is executed on the read replica.
-func (db *DB) Query(query SQLQuery, args ...interface{}) (*sql.Rows, error) {
-	if err := query.Validate(); err != nil {
-		return nil, err
-	}
-	return db.getReplica().Query(query.String(), args...)
-}
-
-// QueryForMaster executes a query that returns rows, typically a SELECT.
-// This method is executed on the master.
-//
-// It is used to refer to the data immediately after executing the mutation query(INSERT/UPDATE/DELETE).
-func (db *DB) QueryForMaster(query SQLQuery, args ...interface{}) (*sql.Rows, error) {
-	if err := query.Validate(); err != nil {
-		return nil, err
-	}
-	return db.master.Query(query.String(), args...)
-}
-
-// QueryContext executes a query that returns rows, typically a SELECT.
-// This method is executed on the read replica.
-func (db *DB) QueryContext(ctx context.Context, query SQLQuery, args ...interface{}) (*sql.Rows, error) {
+func (db *DB) Query(ctx context.Context, query SQLQuery, args ...interface{}) (*sql.Rows, error) {
 	if err := query.Validate(); err != nil {
 		return nil, err
 	}
 	return db.getReplica().QueryContext(ctx, query.String(), args...)
 }
 
-// QueryContextForMaster executes a query that returns rows, typically a SELECT.
+// QueryForMaster executes a query that returns rows, typically a SELECT.
 // This method is executed on the master.
 //
 // It is used to refer to the data immediately after executing the mutation query(INSERT/UPDATE/DELETE).
-func (db *DB) QueryContextForMaster(ctx context.Context, query SQLQuery, args ...interface{}) (*sql.Rows, error) {
+func (db *DB) QueryForMaster(ctx context.Context, query SQLQuery, args ...interface{}) (*sql.Rows, error) {
 	if err := query.Validate(); err != nil {
 		return nil, err
 	}
@@ -204,34 +184,16 @@ func (db *DB) QueryContextForMaster(ctx context.Context, query SQLQuery, args ..
 
 // QueryRow executes a query that is expected to return at most one row. QueryRow always returns a non-nil value. Errors are deferred until Row's Scan method is called. If the query selects no rows, the *Row's Scan will return ErrNoRows. Otherwise, the *Row's Scan scans the first selected row and discards the rest.
 // This method is executed on the read replica.
-func (db *DB) QueryRow(query SQLQuery, args ...interface{}) *sql.Row {
-	if err := query.Validate(); err != nil {
-		return nil
-	}
-	return db.getReplica().QueryRow(query.String(), args...)
-}
-
-// QueryRowForMaster executes a query that is expected to return at most one row. QueryRow always returns a non-nil value. Errors are deferred until Row's Scan method is called. If the query selects no rows, the *Row's Scan will return ErrNoRows. Otherwise, the *Row's Scan scans the first selected row and discards the rest.
-// This method is executed on the master.
-func (db *DB) QueryRowForMaster(query SQLQuery, args ...interface{}) *sql.Row {
-	if err := query.Validate(); err != nil {
-		return nil
-	}
-	return db.master.QueryRow(query.String(), args...)
-}
-
-// QueryRowContext executes a query that is expected to return at most one row. QueryRow always returns a non-nil value. Errors are deferred until Row's Scan method is called. If the query selects no rows, the *Row's Scan will return ErrNoRows. Otherwise, the *Row's Scan scans the first selected row and discards the rest.
-// This method is executed on the read replica.
-func (db *DB) QueryRowContext(ctx context.Context, query SQLQuery, args ...interface{}) *sql.Row {
+func (db *DB) QueryRow(ctx context.Context, query SQLQuery, args ...interface{}) *sql.Row {
 	if err := query.Validate(); err != nil {
 		return nil
 	}
 	return db.getReplica().QueryRowContext(ctx, query.String(), args...)
 }
 
-// QueryRowContextForMaster executes a query that is expected to return at most one row. QueryRow always returns a non-nil value. Errors are deferred until Row's Scan method is called. If the query selects no rows, the *Row's Scan will return ErrNoRows. Otherwise, the *Row's Scan scans the first selected row and discards the rest.
+// QueryRowForMaster executes a query that is expected to return at most one row. QueryRow always returns a non-nil value. Errors are deferred until Row's Scan method is called. If the query selects no rows, the *Row's Scan will return ErrNoRows. Otherwise, the *Row's Scan scans the first selected row and discards the rest.
 // This method is executed on the master.
-func (db *DB) QueryRowContextForMaster(ctx context.Context, query SQLQuery, args ...interface{}) *sql.Row {
+func (db *DB) QueryRowForMaster(ctx context.Context, query SQLQuery, args ...interface{}) *sql.Row {
 	if err := query.Validate(); err != nil {
 		return nil
 	}
@@ -240,34 +202,16 @@ func (db *DB) QueryRowContextForMaster(ctx context.Context, query SQLQuery, args
 
 // PrepareQuery creates a prepared statement for later queries.The caller must call the statement's Close method when the statement is no longer needed.
 // This method is executed on the read replica and can use for SELECT statements only.
-func (db *DB) PrepareQuery(query SQLQuery) (*sql.Stmt, error) {
-	if err := query.Validate(); err != nil {
-		return nil, err
-	}
-	return db.getReplica().Prepare(query.String())
-}
-
-// PrepareQueryForMaster creates a prepared statement for later queries(SELECT).The caller must call the statement's Close method when the statement is no longer needed.
-// This method is executed on the master and can use for SELECT statements only.
-func (db *DB) PrepareQueryForMaster(query SQLQuery) (*sql.Stmt, error) {
-	if err := query.Validate(); err != nil {
-		return nil, err
-	}
-	return db.master.Prepare(query.String())
-}
-
-// PrepareQueryContext creates a prepared statement for later queries.The caller must call the statement's Close method when the statement is no longer needed.
-// This method is executed on the read replica and can use for SELECT statements only.
-func (db *DB) PrepareQueryContext(ctx context.Context, query SQLQuery) (*sql.Stmt, error) {
+func (db *DB) PrepareQuery(ctx context.Context, query SQLQuery) (*sql.Stmt, error) {
 	if err := query.Validate(); err != nil {
 		return nil, err
 	}
 	return db.getReplica().PrepareContext(ctx, query.String())
 }
 
-// PrepareQueryContextForMaster creates a prepared statement for later queries(SELECT).The caller must call the statement's Close method when the statement is no longer needed.
+// PrepareQueryForMaster creates a prepared statement for later queries(SELECT).The caller must call the statement's Close method when the statement is no longer needed.
 // This method is executed on the master and can use for SELECT statements only.
-func (db *DB) PrepareQueryContextForMaster(ctx context.Context, query SQLQuery) (*sql.Stmt, error) {
+func (db *DB) PrepareQueryForMaster(ctx context.Context, query SQLQuery) (*sql.Stmt, error) {
 	if err := query.Validate(); err != nil {
 		return nil, err
 	}
@@ -276,16 +220,7 @@ func (db *DB) PrepareQueryContextForMaster(ctx context.Context, query SQLQuery) 
 
 // PrepareMutation creates a prepared statement for later executions.The caller must call the statement's Close method when the statement is no longer needed.
 // This method is executed on the master and can use for INSERT|UPDATE|DELETE statements only.
-func (db *DB) PrepareMutation(query SQLMutation) (*sql.Stmt, error) {
-	if err := query.Validate(); err != nil {
-		return nil, err
-	}
-	return db.master.Prepare(query.String())
-}
-
-// PrepareMutationContext creates a prepared statement for later executions.The caller must call the statement's Close method when the statement is no longer needed.
-// This method is executed on the master and can use for INSERT|UPDATE|DELETE statements only.
-func (db *DB) PrepareMutationContext(ctx context.Context, query SQLMutation) (*sql.Stmt, error) {
+func (db *DB) PrepareMutation(ctx context.Context, query SQLMutation) (*sql.Stmt, error) {
 	if err := query.Validate(); err != nil {
 		return nil, err
 	}
@@ -294,16 +229,7 @@ func (db *DB) PrepareMutationContext(ctx context.Context, query SQLMutation) (*s
 
 // Exec executes a query without returning any rows. The args are for any placeholder parameters in the query.
 // This method is executed on the master and can use for INSERT|UPDATE|DELETE statements only.
-func (db *DB) Exec(query SQLMutation, args ...interface{}) (sql.Result, error) {
-	if err := query.Validate(); err != nil {
-		return nil, err
-	}
-	return db.master.Exec(query.String(), args...)
-}
-
-// ExecContext executes a query without returning any rows. The args are for any placeholder parameters in the query.
-// This method is executed on the master and can use for INSERT|UPDATE|DELETE statements only.
-func (db *DB) ExecContext(ctx context.Context, query SQLMutation, args ...interface{}) (sql.Result, error) {
+func (db *DB) Exec(ctx context.Context, query SQLMutation, args ...interface{}) (sql.Result, error) {
 	if err := query.Validate(); err != nil {
 		return nil, err
 	}
@@ -312,17 +238,17 @@ func (db *DB) ExecContext(ctx context.Context, query SQLMutation, args ...interf
 
 // Transaction executes paramed function in one database transaction. Executes the passed function and commits the transaction if there is no error. If an error occurs when executing the passed function rolls back the transaction.
 // see sqlw/TxHandlerFunc
-func (db *DB) Transaction(fn TxHandlerFunc) error {
+func (db *DB) Transaction(ctx context.Context, fn TxHandlerFunc) error {
 	db.mu.Lock()
 	defer db.mu.Unlock()
 
-	origin, err := db.master.Begin()
+	origin, err := db.master.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %v", err)
 	}
 	tx := &Tx{origin}
 
-	if err := fn(tx); err != nil {
+	if err := fn(ctx, tx); err != nil {
 		if re := tx.parent.Rollback(); re != nil {
 			if re.Error() != sql.ErrTxDone.Error() {
 				return fmt.Errorf("fialed to rollback: %v", err)
@@ -345,7 +271,7 @@ func (db *DB) TransactionTx(ctx context.Context, fn TxHandlerFunc, opts *sql.TxO
 	}
 	tx := &Tx{origin}
 
-	if err := fn(tx); err != nil {
+	if err := fn(ctx, tx); err != nil {
 		if re := tx.parent.Rollback(); re != nil {
 			if re.Error() != sql.ErrTxDone.Error() {
 				return fmt.Errorf("fialed to rollback: %v", err)

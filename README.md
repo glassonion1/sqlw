@@ -86,8 +86,10 @@ type User struct {
   Name string
 }
 
+ctx := context.Background()
+
 // Query the database(exec on replica)
-rows, err := db.Query("SELECT * FROM users WHERE name = ?", "hoge")
+rows, err := db.Query(ctx, "SELECT * FROM users WHERE name = ?", "hoge")
 if err != nil {
   // TODO: Handle error.
 }
@@ -106,8 +108,10 @@ for rows.Next() {
 
 Query the database uses prepare method(exec on replica)
 ```go
+ctx := context.Background()
+
 // Instanciates statement object
-stmt, err := db.PrepareQuery("SELECT * FROM users WHERE name = ?")
+stmt, err := db.PrepareQuery(ctx, "SELECT * FROM users WHERE name = ?")
 if err != nil {
   // TODO: Handle error.
 }
@@ -136,7 +140,9 @@ if err != nil {
   // TODO: Handle error.
 }
 
-res, err := db.Exec("INSERT INTO users(id, name) VALUES(?, ?)", "id:001", "hoge")
+ctx := context.Background()
+
+res, err := db.Exec(ctx, "INSERT INTO users(id, name) VALUES(?, ?)", "id:001", "hoge")
 if err != nil {
   // TODO: Handle error.
 }
@@ -165,27 +171,31 @@ db, err := sqlw.NewMySQLDB(master, rep1, rep2)
 if err != nil {
   // TODO: Handle error.
 }
+
 // Processes the transaction on the function
-fn := func(tx *sqlw.Tx) error {
-  _, err := tx.Exec("INSER INTO users(id, name) VALUES(?, ?)", "id:001", "hoge")
+fn := func(ctx context.Context, tx *sqlw.Tx) error {
+  _, err := tx.Exec(ctx, "INSER INTO users(id, name) VALUES(?, ?)", "id:001", "hoge")
   if err != nil {
     // rollback on automatically
     return err
   }
-  _, err := tx.Exec("UPDATE users SET name=? WHERE id=?", "piyo", "id:001")
+  _, err := tx.Exec(ctx, "UPDATE users SET name=? WHERE id=?", "piyo", "id:001")
   if err != nil {
     // rollback on automatically
     return err
   }
   return nil
 }
+
+ctx := context.Background()
+
 // Executes transaction function
-if err := db.Transaction(fn); err != nil {
+if err := db.Transaction(ctx, fn); err != nil {
   // TODO: Handle error.
 }
 
 // Query the master database
-rows, err := db.QueryForMaster("SELECT * FROM user")
+rows, err := db.QueryForMaster(ctx, "SELECT * FROM user")
 ```
 
 ## Unit tests

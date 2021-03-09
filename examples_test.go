@@ -1,6 +1,7 @@
 package sqlw_test
 
 import (
+	"context"
 	"log"
 
 	"github.com/glassonion1/sqlw"
@@ -37,8 +38,11 @@ func ExampleDB_Exec() {
 	if err != nil {
 		// TODO: Handle error.
 	}
+
+	ctx := context.Background()
+
 	// Executes mutation query on the master database
-	res, err := db.Exec("INSERT INTO users(id, name) VALUES(?, ?)", "id:001", "hoge")
+	res, err := db.Exec(ctx, "INSERT INTO users(id, name) VALUES(?, ?)", "id:001", "hoge")
 	if err != nil {
 		// TODO: Handle error.
 	}
@@ -57,8 +61,10 @@ func ExampleDB_Query() {
 		Name string
 	}
 
+	ctx := context.Background()
+
 	// Executes query on the replica database
-	rows, err := db.Query("SELECT * FROM users WHERE name = ?", "hoge")
+	rows, err := db.Query(ctx, "SELECT * FROM users WHERE name = ?", "hoge")
 	if err != nil {
 		// TODO: Handle error.
 	}
@@ -83,30 +89,33 @@ func ExampleDB_Transaction() {
 	}
 
 	// Executes multiple queries in database transaction
-	fn := func(tx *sqlw.Tx) error {
-		_, err := tx.Exec("INSER INTO users(id, name) VALUES(?, ?)", "id:001", "hoge")
+	fn := func(ctx context.Context, tx *sqlw.Tx) error {
+		_, err := tx.Exec(ctx, "INSER INTO users(id, name) VALUES(?, ?)", "id:001", "hoge")
 		if err != nil {
 			// Rollbacks automatically
 			return err
 		}
-		_, err = tx.Exec("UPDATE users SET name=? WHERE id=?", "piyo", "id:001")
+		_, err = tx.Exec(ctx, "UPDATE users SET name=? WHERE id=?", "piyo", "id:001")
 		if err != nil {
 			// Rollbacks automatically
 			return err
 		}
 
 		// Warn: this query is executed outside of transaction
-		_, _ = db.Exec("UPDATE hoge SET name='foo'")
+		_, _ = db.Exec(ctx, "UPDATE hoge SET name='foo'")
 
 		return nil
 	}
+
+	ctx := context.Background()
+
 	// Executes transaction and commits automatically if no errors
-	if err := db.Transaction(fn); err != nil {
+	if err := db.Transaction(ctx, fn); err != nil {
 		// TODO: Handle error.
 	}
 
 	// Executes query for master database
-	rows, err := db.QueryForMaster("SELECT * FROM user")
+	rows, err := db.QueryForMaster(ctx, "SELECT * FROM user")
 	if err != nil {
 		// TODO: Handle error.
 	}

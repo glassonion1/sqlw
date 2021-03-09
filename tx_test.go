@@ -50,11 +50,10 @@ func TestTxQuery(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			// No context
 			{
 				got := []user{}
-				fn := func(tx *sqlw.Tx) error {
-					rows, err := tx.Query(tt.in)
+				fn := func(ctx context.Context, tx *sqlw.Tx) error {
+					rows, err := tx.Query(ctx, tt.in)
 					if err != nil {
 						return err
 					}
@@ -68,34 +67,7 @@ func TestTxQuery(t *testing.T) {
 					}
 					return nil
 				}
-				if err := db.Transaction(fn); err != nil {
-					t.Error(err)
-				}
-
-				if diff := cmp.Diff(got, tt.want); diff != "" {
-					t.Errorf("failed test %s: %v", tt.name, diff)
-				}
-			}
-
-			// With context
-			{
-				got := []user{}
-				fn := func(tx *sqlw.Tx) error {
-					rows, err := tx.QueryContext(context.Background(), tt.in)
-					if err != nil {
-						return err
-					}
-					defer rows.Close()
-					for rows.Next() {
-						user := user{}
-						if err := rows.Scan(&user.ID, &user.Name); err != nil {
-							t.Error(err)
-						}
-						got = append(got, user)
-					}
-					return nil
-				}
-				if err := db.Transaction(fn); err != nil {
+				if err := db.Transaction(context.Background(), fn); err != nil {
 					t.Error(err)
 				}
 
@@ -144,11 +116,10 @@ func TestTxQueryRow(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			// No context
 			{
 				got := user{}
-				fn := func(tx *sqlw.Tx) error {
-					row := tx.QueryRow(tt.in)
+				fn := func(ctx context.Context, tx *sqlw.Tx) error {
+					row := tx.QueryRow(ctx, tt.in)
 					if err := row.Err(); err != nil {
 						t.Error(err)
 					}
@@ -157,29 +128,7 @@ func TestTxQueryRow(t *testing.T) {
 					}
 					return nil
 				}
-				if err := db.Transaction(fn); err != nil {
-					t.Error(err)
-				}
-
-				if diff := cmp.Diff(got, tt.want); diff != "" {
-					t.Errorf("failed test %s: %v", tt.name, diff)
-				}
-			}
-
-			// With context
-			{
-				got := user{}
-				fn := func(tx *sqlw.Tx) error {
-					row := tx.QueryRowContext(context.Background(), tt.in)
-					if err := row.Err(); err != nil {
-						t.Error(err)
-					}
-					if err := row.Scan(&got.ID, &got.Name); err != nil {
-						t.Error(err)
-					}
-					return nil
-				}
-				if err := db.Transaction(fn); err != nil {
+				if err := db.Transaction(context.Background(), fn); err != nil {
 					t.Error(err)
 				}
 
@@ -259,25 +208,21 @@ func TestTxExec(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			fn := func(tx *sqlw.Tx) error {
-				for i, sql := range tt.in {
-					var err error
-					if i == 0 {
-						_, err = tx.ExecContext(context.Background(), sql)
-					} else {
-						_, err = tx.Exec(sql)
-					}
+			fn := func(ctx context.Context, tx *sqlw.Tx) error {
+				for _, sql := range tt.in {
+					_, err := tx.Exec(ctx, sql)
 					if err != nil {
 						return err
 					}
 				}
 				return nil
 			}
-			if err := db.Transaction(fn); err != nil {
+			ctx := context.Background()
+			if err := db.Transaction(ctx, fn); err != nil {
 				log.Print(err)
 			}
 
-			rows, err := db.QueryForMaster("SELECT * FROM products")
+			rows, err := db.QueryForMaster(ctx, "SELECT * FROM products")
 			if err != nil && err.Error() != tt.err.Error() {
 				t.Errorf("testing %s: should be error of %v but got: %v", tt.name, tt.err, err)
 			}
